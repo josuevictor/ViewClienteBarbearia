@@ -69,7 +69,7 @@ function App() {
     if (servicoSelecionado && barbeiroSelecionado && dataSelecionada && horaSelecionada && cliente_id) {
       const servico = servicos.find(s => s.id === servicoSelecionado);
       const barbeiro = funcionarios.find(b => b.funcionario_id === barbeiroSelecionado);
-      
+
       //Objeto com os dados do agendamento que serão enviados para a API
       const agendamento = {
         servico: servicoSelecionado,
@@ -81,7 +81,7 @@ function App() {
 
       //Envia requisição para a API
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/agendar', {
+        const response = await fetch('https://backendbarbearia-2.onrender.com/api/agendar', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -174,7 +174,7 @@ function App() {
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-3xl font-bold text-gray-800 mb-8">Agende seu horário</h2>
-          
+
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Serviços */}
             <section className="bg-white p-6 rounded-lg shadow-md">
@@ -186,11 +186,10 @@ function App() {
                 {servicos.map((servico) => (
                   <div
                     key={servico.id}
-                    className={`p-4 border rounded-lg cursor-pointer transition-all ${
-                      servicoSelecionado === servico.id
+                    className={`p-4 border rounded-lg cursor-pointer transition-all ${servicoSelecionado === servico.id
                         ? 'border-blue-500 bg-blue-50'
                         : 'border-gray-200 hover:border-blue-300'
-                    }`}
+                      }`}
                     onClick={() => setServicoSelecionado(servico.id)}
                   >
                     <h4 className="font-medium">{servico.nome}</h4>
@@ -237,11 +236,10 @@ function App() {
                   {funcionarios.map((barbeiro) => (
                     <div
                       key={barbeiro.funcionario_id}
-                      className={`p-4 border rounded-lg cursor-pointer transition-all text-center ${
-                        barbeiroSelecionado === barbeiro.funcionario_id
+                      className={`p-4 border rounded-lg cursor-pointer transition-all text-center ${barbeiroSelecionado === barbeiro.funcionario_id
                           ? 'border-blue-500 bg-blue-50'
                           : 'border-gray-200 hover:border-blue-300'
-                      }`}
+                        }`}
                       onClick={() => setBarbeiroSelecionado(barbeiro.funcionario_id)}
                     >
                       <img
@@ -284,11 +282,10 @@ function App() {
                       <button
                         key={horario}
                         type="button"
-                        className={`p-2 text-sm border rounded-md ${
-                          horaSelecionada === horario
+                        className={`p-2 text-sm border rounded-md ${horaSelecionada === horario
                             ? 'bg-blue-500 text-white border-blue-500'
                             : 'border-gray-300 hover:border-blue-300'
-                        }`}
+                          }`}
                         onClick={() => setHoraSelecionada(horario)}
                       >
                         {horario}

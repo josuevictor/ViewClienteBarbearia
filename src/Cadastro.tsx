@@ -14,7 +14,7 @@ const Cadastro = ({ onClose }: { onClose: () => void }) => {
     e.preventDefault();
     // Aqui você pode adicionar a lógica para enviar os dados de cadastro para a API
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/CadastrarCliente', {
+      const response = await fetch('https://backendbarbearia-2.onrender.com/api/CadastrarCliente', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
