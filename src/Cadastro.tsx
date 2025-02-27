@@ -10,9 +10,11 @@ const Cadastro = ({ onClose }: { onClose: () => void }) => {
   const [senha, setSenha] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     // Aqui você pode adicionar a lógica para enviar os dados de cadastro para a API
     try {
       const response = await fetch('https://backendbarbearia-2.onrender.com/api/CadastrarCliente', {
@@ -44,6 +46,8 @@ const Cadastro = ({ onClose }: { onClose: () => void }) => {
     } catch (error) {
       console.error('Erro ao fazer cadastro:', error);
       setErrorMessage('Erro ao fazer cadastro. Tente novamente.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -153,8 +157,9 @@ const Cadastro = ({ onClose }: { onClose: () => void }) => {
           <button
             type="submit"
             className="w-full bg-blue-600 text-white py-2 px-4 rounded-md font-medium hover:bg-blue-700 transition-colors"
+            disabled={isLoading}
           >
-            Cadastrar
+            {isLoading ? 'Cadastrando...' : 'Cadastrar'}
           </button>
         </form>
       </div>
