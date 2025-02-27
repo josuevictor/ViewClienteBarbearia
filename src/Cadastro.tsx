@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Swal from 'sweetalert2';
 
 const Cadastro = ({ onClose }: { onClose: () => void }) => {
   const [nome, setNome] = useState('');
@@ -27,8 +28,14 @@ const Cadastro = ({ onClose }: { onClose: () => void }) => {
       if (response.ok && data.success) {
         // Lógica para lidar com o sucesso do cadastro
         console.log('Cadastro bem-sucedido:', data);
-        alert(data.msg || 'Cadastro realizado com sucesso!');
-        onClose();
+        Swal.fire({
+          title: 'Sucesso!',
+          text: data.msg || 'Cadastro realizado com sucesso!',
+          icon: 'success',
+          confirmButtonText: 'OK'
+        }).then(() => {
+          onClose();
+        });
       } else {
         // Lógica para lidar com o erro de cadastro
         console.error('Erro ao fazer cadastro:', data.msg);
