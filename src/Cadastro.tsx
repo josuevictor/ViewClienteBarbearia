@@ -52,7 +52,7 @@ const Cadastro = ({ onClose }: { onClose: () => void }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-start justify-center bg-gray-100 pt-4">
       <div className="bg-white p-10 rounded-lg shadow-md w-full max-w-4xl relative" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
         <button
           onClick={onClose}
@@ -60,7 +60,7 @@ const Cadastro = ({ onClose }: { onClose: () => void }) => {
         >
           &times;
         </button>
-        <h2 className="text-3xl font-bold mb-6 text-center">Cadastro de novo cliente</h2>
+        <h2 className="text-3xl font-bold mb-6 text-center">cadastre-se aqui</h2>
         {errorMessage && (
           <div className="mb-4 text-red-500 text-center">
             {errorMessage}
