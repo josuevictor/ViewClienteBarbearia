@@ -148,6 +148,10 @@ function App() {
     });
   };
 
+  const today = new Date();
+  const maxDate = new Date();
+  maxDate.setDate(today.getDate() + 45);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-gray-900 text-white py-6">
@@ -269,7 +273,8 @@ function App() {
                     type="date"
                     value={dataSelecionada}
                     onChange={(e) => setDataSelecionada(e.target.value)}
-                    min={new Date().toISOString().split('T')[0]}
+                    min={today.toISOString().split('T')[0]}
+                    max={maxDate.toISOString().split('T')[0]}
                     className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
