@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
+import InputMask from 'react-input-mask';
 
 const Cadastro = ({ onClose }: { onClose: () => void }) => {
   const [nome, setNome] = useState('');
@@ -12,10 +13,11 @@ const Cadastro = ({ onClose }: { onClose: () => void }) => {
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  const isFormValid = nome && sobrenome && email && telefone && cpf && senha;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Aqui você pode adicionar a lógica para enviar os dados de cadastro para a API
     try {
       const response = await fetch('https://backendbarbearia-2.onrender.com/api/CadastrarCliente', {
         method: 'POST',
@@ -28,7 +30,6 @@ const Cadastro = ({ onClose }: { onClose: () => void }) => {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        // Lógica para lidar com o sucesso do cadastro
         console.log('Cadastro bem-sucedido:', data);
         Swal.fire({
           title: 'Sucesso!',
@@ -39,7 +40,6 @@ const Cadastro = ({ onClose }: { onClose: () => void }) => {
           onClose();
         });
       } else {
-        // Lógica para lidar com o erro de cadastro
         console.error('Erro ao fazer cadastro:', data.msg);
         setErrorMessage(data.msg || 'Erro ao fazer cadastro');
       }
@@ -53,20 +53,20 @@ const Cadastro = ({ onClose }: { onClose: () => void }) => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-4 rounded-lg shadow-md w-full max-w-md relative" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      <div className="bg-white p-10 rounded-lg shadow-md w-full max-w-4xl relative" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-6xl"
         >
           &times;
         </button>
-        <h2 className="text-xl font-bold mb-4 text-center">Cadastro de Novo Usuário</h2>
+        <h2 className="text-3xl font-bold mb-6 text-center">Cadastro de novo cliente</h2>
         {errorMessage && (
-          <div className="mb-2 text-red-500 text-center">
+          <div className="mb-4 text-red-500 text-center">
             {errorMessage}
           </div>
         )}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label htmlFor="nome" className="block text-sm font-medium text-gray-700">
               Nome
@@ -77,7 +77,7 @@ const Cadastro = ({ onClose }: { onClose: () => void }) => {
               value={nome}
               onChange={(e) => setNome(e.target.value)}
               required
-              className="mt-1 p-1 w-full border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className="mt-1 p-2 w-full border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
           <div>
@@ -90,7 +90,7 @@ const Cadastro = ({ onClose }: { onClose: () => void }) => {
               value={sobrenome}
               onChange={(e) => setSobrenome(e.target.value)}
               required
-              className="mt-1 p-1 w-full border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className="mt-1 p-2 w-full border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
           <div>
@@ -103,33 +103,33 @@ const Cadastro = ({ onClose }: { onClose: () => void }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="mt-1 p-1 w-full border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className="mt-1 p-2 w-full border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
           <div>
             <label htmlFor="telefone" className="block text-sm font-medium text-gray-700">
               Telefone
             </label>
-            <input
-              type="tel"
+            <InputMask
+              mask="(99) 99999-9999"
               id="telefone"
               value={telefone}
               onChange={(e) => setTelefone(e.target.value)}
               required
-              className="mt-1 p-1 w-full border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className="mt-1 p-2 w-full border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
           <div>
             <label htmlFor="cpf" className="block text-sm font-medium text-gray-700">
               CPF
             </label>
-            <input
-              type="text"
+            <InputMask
+              mask="999.999.999-99"
               id="cpf"
               value={cpf}
               onChange={(e) => setCpf(e.target.value)}
               required
-              className="mt-1 p-1 w-full border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className="mt-1 p-2 w-full border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
           <div>
@@ -143,12 +143,12 @@ const Cadastro = ({ onClose }: { onClose: () => void }) => {
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
                 required
-                className="mt-1 p-1 w-full border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="mt-1 p-2 w-full border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 px-2 py-1 text-gray-500 hover:text-gray-700"
+                className="absolute inset-y-0 right-0 px-3 py-2 text-gray-500 hover:text-gray-700"
               >
                 {showPassword ? "Ocultar" : "Mostrar"}
               </button>
@@ -156,8 +156,12 @@ const Cadastro = ({ onClose }: { onClose: () => void }) => {
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md font-medium hover:bg-blue-700 transition-colors"
-            disabled={isLoading}
+            className={`w-full py-3 px-4 rounded-md font-medium transition-colors ${
+              isFormValid && !isLoading
+                ? 'bg-blue-600 text-white hover:bg-blue-700'
+                : 'bg-gray-400 text-gray-700 cursor-not-allowed'
+            }`}
+            disabled={!isFormValid || isLoading}
           >
             {isLoading ? 'Cadastrando...' : 'Cadastrar'}
           </button>

@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Modal from 'react-modal';
 import Cadastro from './Cadastro';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const LoginForm = ({ onLogin }: { onLogin: () => void }) => {
   const [email, setEmail] = useState('');
@@ -30,9 +32,11 @@ const LoginForm = ({ onLogin }: { onLogin: () => void }) => {
       } else {
         const errorData = await response.json();
         console.error('Erro ao fazer login:', errorData.message);
+        toast.error('Erro de email ou senha inválidos');
       }
     } catch (error) {
       console.error('Erro ao fazer login:', error);
+      toast.error('Erro ao fazer login. Tente novamente.');
     } finally {
       setLoading(false);
     }
@@ -110,6 +114,7 @@ const LoginForm = ({ onLogin }: { onLogin: () => void }) => {
           Cadastre-se
         </button>
       </div>
+      <ToastContainer />
     </div>
   );
 };
