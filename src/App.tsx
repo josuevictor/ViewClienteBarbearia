@@ -152,6 +152,17 @@ function App() {
   const maxDate = new Date();
   maxDate.setDate(today.getDate() + 45);
 
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedDate = new Date(e.target.value);
+    if (selectedDate < today) {
+      setDataSelecionada(today.toISOString().split('T')[0]);
+    } else if (selectedDate > maxDate) {
+      setDataSelecionada(maxDate.toISOString().split('T')[0]);
+    } else {
+      setDataSelecionada(e.target.value);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-gray-900 text-white py-6">
@@ -272,7 +283,7 @@ function App() {
                   <input
                     type="date"
                     value={dataSelecionada}
-                    onChange={(e) => setDataSelecionada(e.target.value)}
+                    onChange={handleDateChange}
                     min={today.toISOString().split('T')[0]}
                     max={maxDate.toISOString().split('T')[0]}
                     className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
