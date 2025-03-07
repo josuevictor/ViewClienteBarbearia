@@ -156,8 +156,20 @@ function App() {
     const selectedDate = new Date(e.target.value);
     if (selectedDate < today) {
       setDataSelecionada(today.toISOString().split('T')[0]);
+      MySwal.fire({
+        title: 'Data Inválida',
+        text: 'Não é possível agendar para uma data anterior a hoje.',
+        icon: 'error',
+        confirmButtonText: 'Fechar'
+      });
     } else if (selectedDate > maxDate) {
       setDataSelecionada(maxDate.toISOString().split('T')[0]);
+      MySwal.fire({
+        title: 'Data Inválida',
+        text: 'Não é possível agendar para uma data além dos próximos 45 dias.',
+        icon: 'error',
+        confirmButtonText: 'Fechar'
+      });
     } else {
       setDataSelecionada(e.target.value);
     }
