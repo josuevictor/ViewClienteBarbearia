@@ -24,7 +24,7 @@ const MySwal = withReactContent(Swal);
 function App() {
   const [servicoSelecionado, setServicoSelecionado] = useState<number | null>(null);
   const [barbeiroSelecionado, setBarbeiroSelecionado] = useState<number | null>(null);
-  const [dataSelecionada, setDataSelecionada] = useState<string>('');
+  const [dataSelecionada, setDataSelecionada] = useState<string>(new Date().toISOString().split('T')[0]);
   const [horaSelecionada, setHoraSelecionada] = useState<string>('');
   const [funcionarios, setFuncionarios] = useState<Barbeiro[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
