@@ -19,6 +19,14 @@ type Barbeiro = {
   foto: string;
 };
 
+type Agendamento = {
+  cliente: string;
+  horario: string;
+  servico: string;
+  barbeiro: string;
+  status: string;
+};
+
 const MySwal = withReactContent(Swal);
 
 function App() {
@@ -27,7 +35,10 @@ function App() {
   const [dataSelecionada, setDataSelecionada] = useState<string>(new Date().toISOString().split('T')[0]);
   const [horaSelecionada, setHoraSelecionada] = useState<string>('');
   const [funcionarios, setFuncionarios] = useState<Barbeiro[]>([]);
+  const [agendamentos, setAgendamentos] = useState<Agendamento[]>([]);
+  const [horariosDisponiveis, setHorariosDisponiveis] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [loadingHorarios, setLoadingHorarios] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const navigate = useNavigate();
 
@@ -47,6 +58,11 @@ function App() {
         foto: `https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=150&h=150&fit=crop`
       }));
       setFuncionarios(barbeirosComFotos);
+
+      const response = await fetch('https://backendbarbearia-2.onrender.com/api/agendamento');
+      const data = await response.json();
+      setAgendamentos(data.object.original);
+
       setLoading(false);
     };
 
@@ -57,16 +73,53 @@ function App() {
     console.log('cliente_id:', cliente_id);
   }, []);
 
-  const horarios = [
-    '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-    '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'
-  ];
+  useEffect(() => {
+    const fetchHorariosDisponiveis = async () => {
+      if (barbeiroSelecionado && dataSelecionada) {
+        setLoadingHorarios(true);
+        try {
+          const response = await fetch(
+            `https://backendbarbearia-2.onrender.com/api/horariosDisponiveis?data=${dataSelecionada}&barbeiro_id=${barbeiroSelecionado}`
+          );
+          const data = await response.json();
+          setHorariosDisponiveis(data);
+        } catch (error) {
+          console.error('Erro ao buscar horários disponíveis:', error);
+        } finally {
+          setLoadingHorarios(false);
+        }
+      }
+    };
+
+    fetchHorariosDisponiveis();
+  }, [barbeiroSelecionado, dataSelecionada]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     const cliente_id = localStorage.getItem('cliente_id'); // Recupera o cliente_id
-    if (servicoSelecionado && barbeiroSelecionado && dataSelecionada && horaSelecionada && cliente_id) {
+    const cpf_cliente = localStorage.getItem('cpf_cliente'); // Recupera o cpf_cliente
+    console.log('cpf_cliente:', cpf_cliente); // Imprime o CPF do cliente no console
+
+    // Verifica se o usuário já tem um agendamento no mesmo dia
+    const hasAgendamentoNoMesmoDia = agendamentos.some(
+      (agendamento) =>
+        agendamento.cliente === cliente_id &&
+        agendamento.horario.split(' ')[0] === dataSelecionada
+    );
+
+    if (hasAgendamentoNoMesmoDia) {
+      MySwal.fire({
+        title: 'Erro ao Realizar Agendamento',
+        text: 'Você já tem um agendamento neste dia.',
+        icon: 'error',
+        confirmButtonText: 'Fechar'
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (servicoSelecionado && barbeiroSelecionado && dataSelecionada && horaSelecionada && cliente_id && cpf_cliente) {
       const servico = servicos.find(s => s.id === servicoSelecionado);
       const barbeiro = funcionarios.find(b => b.funcionario_id === barbeiroSelecionado);
 
@@ -74,7 +127,7 @@ function App() {
       const agendamento = {
         servico: servicoSelecionado,
         cliente_id: parseInt(cliente_id),
-        cpf_cliente: '13646189401',
+        cpf_cliente: cpf_cliente,
         data_hora: dataSelecionada + ' ' + horaSelecionada,
         barbeiro: barbeiroSelecionado,
       };
@@ -89,7 +142,9 @@ function App() {
           body: JSON.stringify(agendamento)
         });
 
-        if (response.ok) {
+        const data = await response.json();
+
+        if (response.ok && data.response !== 'error') {
           MySwal.fire({
             title: 'Agendamento Realizado com Sucesso!',
             html: `
@@ -101,11 +156,17 @@ function App() {
             icon: 'success',
             confirmButtonText: 'Fechar'
           });
-        } else {
-          const errorData = await response.json();
+        } else if (data.response === 'error' && data.error_code === 409) {
           MySwal.fire({
             title: 'Erro ao Realizar Agendamento',
-            text: errorData.message,
+            text: data.message,
+            icon: 'error',
+            confirmButtonText: 'Fechar'
+          });
+        } else {
+          MySwal.fire({
+            title: 'Erro ao Realizar Agendamento',
+            text: data.message || 'Erro desconhecido',
             icon: 'error',
             confirmButtonText: 'Fechar'
           });
@@ -127,6 +188,7 @@ function App() {
   const handleLogout = () => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('cliente_id'); // Remove o cliente_id ao deslogar
+    localStorage.removeItem('cpf_cliente'); // Remove o cpf_cliente ao deslogar
     navigate('/login');
   };
 
@@ -173,6 +235,14 @@ function App() {
     } else {
       setDataSelecionada(e.target.value);
     }
+  };
+
+  const isHorarioDisponivel = (horario: string) => {
+    return horariosDisponiveis.includes(horario) && !agendamentos.some(
+      (agendamento) =>
+        agendamento.barbeiro === barbeiroSelecionado?.toString() &&
+        agendamento.horario === `${dataSelecionada} ${horario}`
+    );
   };
 
   return (
@@ -305,21 +375,49 @@ function App() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Horário
                   </label>
-                  <div className="grid grid-cols-4 gap-2">
-                    {horarios.map((horario) => (
-                      <button
-                        key={horario}
-                        type="button"
-                        className={`p-2 text-sm border rounded-md ${horaSelecionada === horario
-                            ? 'bg-blue-500 text-white border-blue-500'
-                            : 'border-gray-300 hover:border-blue-300'
-                          }`}
-                        onClick={() => setHoraSelecionada(horario)}
+                  {loadingHorarios ? (
+                    <div className="flex justify-center items-center">
+                      <svg
+                        className="animate-spin h-8 w-8 text-gray-600"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
                       >
-                        {horario}
-                      </button>
-                    ))}
-                  </div>
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v8H4z"
+                        ></path>
+                      </svg>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-4 gap-2">
+                      {horariosDisponiveis.map((horario) => (
+                        <button
+                          key={horario}
+                          type="button"
+                          className={`p-2 text-sm border rounded-md transition-all
+                            ${horaSelecionada === horario
+                              ? 'bg-blue-500 text-white border-blue-500'
+                              : isHorarioDisponivel(horario)
+                              ? 'bg-white text-gray-700 border-gray-300 hover:bg-blue-100'
+                              : 'bg-red-500 text-white border-red-500 cursor-not-allowed'}`}
+                          disabled={!isHorarioDisponivel(horario)}
+                          onClick={() => isHorarioDisponivel(horario) && setHoraSelecionada(horario)}
+                        >
+                          {horario}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </section>

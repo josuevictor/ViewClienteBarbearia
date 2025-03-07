@@ -15,16 +15,22 @@ const Cadastro = ({ onClose }: { onClose: () => void }) => {
 
   const isFormValid = nome && sobrenome && email && telefone && cpf && senha;
 
+  const removeMask = (value: string) => {
+    return value.replace(/\D/g, '');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    const cpfSemMascara = removeMask(cpf);
+    const telefoneSemMascara = removeMask(telefone);
     try {
       const response = await fetch('https://backendbarbearia-2.onrender.com/api/CadastrarCliente', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ nome, sobrenome, cpf, email, telefone, senha })
+        body: JSON.stringify({ nome, sobrenome, cpf: cpfSemMascara, email, telefone: telefoneSemMascara, senha })
       });
 
       const data = await response.json();

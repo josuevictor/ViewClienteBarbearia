@@ -27,6 +27,7 @@ const LoginForm = ({ onLogin }: { onLogin: () => void }) => {
         const data = await response.json();
         localStorage.setItem('authToken', data.token);
         localStorage.setItem('cliente_id', data.cliente_id); // Armazena o cliente_id
+        localStorage.setItem('cpf_cliente', data.cpf); // Armazena o cpf_cliente
         console.log('Login bem-sucedido:', data);
         navigate('/app');
       } else {
